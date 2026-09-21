@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import type { ProfileMode, UserProfile } from '../types';
 import { currentUser } from '../data/mockData';
 

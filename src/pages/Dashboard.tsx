@@ -1,4 +1,3 @@
-import React from 'react';
 import { useProfile } from '../context/ProfileContext';
 import DashboardPotencia from './dashboard/DashboardPotencia';
 import DashboardLoja from './dashboard/DashboardLoja';

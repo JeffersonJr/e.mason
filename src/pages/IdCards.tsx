@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Download, Printer, Share2, QrCode, ChevronLeft, ChevronRight, CreditCard, Smartphone } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Badge, { StatusBadge, DegreeBadge } from '../components/ui/Badge';

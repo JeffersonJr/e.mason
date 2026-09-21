@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { DollarSign, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Plus, Download, Filter } from 'lucide-react';
+import { useState } from 'react';
+import { DollarSign, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Plus, Download } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Card, { MetricCard } from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
@@ -99,7 +99,7 @@ export default function Finance() {
               tickFormatter={v => `R$${(v / 1000).toFixed(1)}k`} />
             <Tooltip
               contentStyle={{ borderRadius: 10, border: '1px solid var(--color-border)', fontSize: 12, fontFamily: 'var(--font-family)' }}
-              formatter={(v: number) => formatMoney(v)}
+              formatter={(v) => formatMoney(Number(v || 0))}
             />
             <Area type="monotone" dataKey="receita" name="Receitas" stroke="#00C288" strokeWidth={2} fill="url(#receitaGrad)" />
             <Area type="monotone" dataKey="despesa" name="Despesas" stroke="#EF4444" strokeWidth={2} fill="url(#despesaGrad)" />

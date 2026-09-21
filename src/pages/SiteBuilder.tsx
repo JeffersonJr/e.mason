@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Monitor, Smartphone, Eye, Save, Plus, Settings,
-  Image, Type, Layout, Columns, AlignLeft, ChevronRight,
+  Image, Type, Layout, Columns, AlignLeft,
   Home, FileText, BookOpen, Phone, Globe, ArrowUp, ArrowDown, Trash2,
 } from 'lucide-react';
-import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import MasonicHex from '../components/ui/MasonicHex';

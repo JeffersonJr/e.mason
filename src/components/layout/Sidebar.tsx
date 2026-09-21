@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Users, CreditCard, FolderOpen,
   Globe, DollarSign, Settings, ChevronRight,
-  Building2, Shield, LogOut, HelpCircle,
-  Bell, Zap,
+  Building2, Shield, LogOut, Zap,
 } from 'lucide-react';
 import { useProfile } from '../../context/ProfileContext';
 import type { ProfileMode } from '../../types';
@@ -41,7 +40,6 @@ const modeLabels: Record<ProfileMode, { label: string; sublabel: string }> = {
 
 export default function Sidebar() {
   const { mode, user } = useProfile();
-  const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
 
   const visibleItems = navItems.filter(item => item.accessLevels.includes(mode));

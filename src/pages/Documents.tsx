@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, Download, Eye, Lock, FileText, Book, Bell, FileCheck, Filter } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Download, Eye, Lock, FileText, Book, Bell, FileCheck } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
@@ -33,7 +33,7 @@ const categoryColors: Record<string, string> = {
 };
 
 export default function Documents() {
-  const { mode, user } = useProfile();
+  const { mode } = useProfile();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [previewDoc, setPreviewDoc] = useState<Document | null>(null);
