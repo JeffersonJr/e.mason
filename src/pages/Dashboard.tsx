@@ -1,7 +1,7 @@
 import { useProfile } from '../context/ProfileContext';
-import DashboardPotencia from './dashboard/DashboardPotencia';
-import DashboardLoja from './dashboard/DashboardLoja';
-import DashboardIrmao from './dashboard/DashboardIrmao';
+import DashboardPotencia from './dashboards/DashboardPotencia';
+import DashboardLoja from './dashboards/DashboardLoja';
+import DashboardIrmao from './dashboards/DashboardIrmao';
 import './Dashboard.css';
 
 export default function Dashboard() {
