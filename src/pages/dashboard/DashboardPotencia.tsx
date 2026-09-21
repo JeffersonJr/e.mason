@@ -1,9 +1,7 @@
-import React from 'react';
 import './DashboardPotencia.css';
 import {
   Building2, Users, TrendingUp, AlertTriangle,
-  CheckCircle, Calendar, ArrowRight, MapPin, User,
-  Send, BarChart3
+  CheckCircle, Calendar, MapPin, Send, ArrowRight, User, BarChart3,
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,

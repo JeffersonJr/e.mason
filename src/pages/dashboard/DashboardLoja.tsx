@@ -1,8 +1,8 @@
+import type { ReactNode } from 'react';
 import './DashboardLoja.css';
 import {
   Users, DollarSign, Calendar, CheckCircle,
-  AlertTriangle, TrendingUp, Plus, FileText, Send, CreditCard,
-  MapPin,
+  AlertTriangle, TrendingUp, Send, MapPin, Plus, FileText, CreditCard,
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -14,7 +14,7 @@ import Button from '../../components/ui/Button';
 import Avatar from '../../components/ui/Avatar';
 import { mockMembers, mockActivities, monthlyActivityData } from '../../data/mockData';
 
-const activityIcons: Record<string, React.ReactNode> = {
+const activityIcons: Record<string, ReactNode> = {
   session: <Calendar size={16} />,
   payment: <AlertTriangle size={16} />,
   new_member: <Users size={16} />,
