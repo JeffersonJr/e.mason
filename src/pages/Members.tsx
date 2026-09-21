@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Search, Filter, Plus, Download, Eye, MoreHorizontal, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Plus, Download, Eye, MoreHorizontal } from 'lucide-react';
 import Card from '../components/ui/Card';
-import Badge, { StatusBadge, DegreeBadge } from '../components/ui/Badge';
+import { StatusBadge, DegreeBadge } from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Avatar from '../components/ui/Avatar';
 import { mockMembers } from '../data/mockData';
@@ -9,13 +9,10 @@ import type { Member } from '../types';
 import './Members.css';
 
 const officeGroups = ['Todos', 'Luzes', 'Cargos Administrativos', 'Irmãos'];
-const statusFilters = ['Todos', 'Adimplente', 'Inadimplente', 'Licenciado'];
 
 export default function Members() {
   const [search, setSearch] = useState('');
   const [officeGroup, setOfficeGroup] = useState('Todos');
-  const [statusFilter, setStatusFilter] = useState('Todos');
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
   const luzes = ['Venerável Mestre', '1º Vigilante', '2º Vigilante'];
@@ -24,13 +21,12 @@ export default function Members() {
   const filtered = mockMembers.filter(m => {
     const matchSearch = m.name.toLowerCase().includes(search.toLowerCase()) ||
       (m.office || '').toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === 'Todos' || m.status === statusFilter.toLowerCase();
     const matchGroup = officeGroup === 'Todos'
       ? true
       : officeGroup === 'Luzes' ? luzes.includes(m.office || '')
       : officeGroup === 'Cargos Administrativos' ? cargosAdm.includes(m.office || '')
       : !luzes.includes(m.office || '') && !cargosAdm.includes(m.office || '');
-    return matchSearch && matchStatus && matchGroup;
+    return matchSearch && matchGroup;
   });
 
   return (

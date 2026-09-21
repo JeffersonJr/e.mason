@@ -6,12 +6,12 @@ import {
   Send, BarChart3
 } from 'lucide-react';
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, BarChart, Bar, Legend
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell
 } from 'recharts';
 import { MetricCard } from '../../components/ui/Card';
 import Card from '../../components/ui/Card';
-import Badge, { StatusBadge } from '../../components/ui/Badge';
+import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import { mockLodges, mockActivities, monthlyActivityData, adimplenciaData, lodgeActivityData } from '../../data/mockData';
 

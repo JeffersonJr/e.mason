@@ -1,5 +1,4 @@
-import React from 'react';
-import { Calendar, FileText, CreditCard, DollarSign, CheckCircle, Clock, Star, AlertTriangle } from 'lucide-react';
+import { Calendar, DollarSign, CheckCircle, Clock, Star, CreditCard } from 'lucide-react';
 import Card from '../../components/ui/Card';
 import Badge, { StatusBadge, DegreeBadge } from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';

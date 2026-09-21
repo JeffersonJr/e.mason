@@ -1,16 +1,15 @@
-import React from 'react';
-import './DashboardPotencia.css';
+import './DashboardLoja.css';
 import {
   Users, DollarSign, Calendar, CheckCircle,
   AlertTriangle, TrendingUp, Plus, FileText, Send, CreditCard,
-  Clock, MapPin,
+  MapPin,
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import { MetricCard } from '../../components/ui/Card';
 import Card from '../../components/ui/Card';
-import Badge, { StatusBadge, DegreeBadge } from '../../components/ui/Badge';
+import { StatusBadge, DegreeBadge } from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Avatar from '../../components/ui/Avatar';
 import { mockMembers, mockActivities, monthlyActivityData } from '../../data/mockData';
@@ -24,10 +23,7 @@ const activityIcons: Record<string, React.ReactNode> = {
   degree: <TrendingUp size={16} />,
 };
 
-const formatDate = (str: string) => {
-  const d = new Date(str);
-  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-};
+
 
 export default function DashboardLoja() {
   const presenceData = [
