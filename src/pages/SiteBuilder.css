@@ -451,6 +451,12 @@
   background: var(--color-surface-2);
 }
 
+.sb-canvas--mobile .canvas-columns-preview {
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 16px;
+}
+
 .canvas-col-card {
   background: white;
   border: 1px solid var(--color-border);

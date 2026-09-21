@@ -1,7 +1,15 @@
 .dashboard {
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
+  gap: var(--space-6);
+}
+
+.dash-potencia,
+.dash-loja,
+.dash-irmao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
 }
 
 .dash-section-title {
