@@ -1,0 +1,85 @@
+.potencia-welcome {
+  background: var(--color-gradient);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  position: relative;
+  overflow: hidden;
+}
+
+.potencia-welcome::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 200px;
+  height: 200px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+
+.potencia-welcome::after {
+  content: '';
+  position: absolute;
+  bottom: -60px;
+  right: 120px;
+  width: 160px;
+  height: 160px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 50%;
+}
+
+.potencia-welcome__greeting {
+  font-size: var(--font-size-sm);
+  color: rgba(255,255,255,0.75);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: 4px;
+}
+
+.potencia-welcome__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: white;
+  line-height: 1.2;
+}
+
+.potencia-welcome__sub {
+  font-size: var(--font-size-sm);
+  color: rgba(255,255,255,0.65);
+  margin-top: 6px;
+}
+
+.potencia-welcome__actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.potencia-welcome__actions .btn--primary {
+  background: rgba(255,255,255,0.20);
+  backdrop-filter: blur(8px);
+  color: white;
+  box-shadow: none;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.potencia-welcome__actions .btn--primary:hover {
+  background: rgba(255,255,255,0.30);
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+
+.potencia-welcome__actions .btn--outline {
+  border-color: rgba(255,255,255,0.35);
+  color: white;
+  background: transparent;
+}
+
+.potencia-welcome__actions .btn--outline:hover {
+  background: rgba(255,255,255,0.15);
+}

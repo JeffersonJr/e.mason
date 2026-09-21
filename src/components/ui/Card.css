@@ -1,0 +1,134 @@
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.card--pad-none { padding: 0; }
+.card--pad-sm { padding: var(--space-4); }
+.card--pad-md { padding: var(--space-6); }
+.card--pad-lg { padding: var(--space-8); }
+
+.card--hover:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.card--clickable {
+  cursor: pointer;
+}
+
+.card--clickable:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* === METRIC CARD === */
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-gradient);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.metric-card:hover::before {
+  opacity: 1;
+}
+
+.metric-card--gradient {
+  background: var(--color-gradient);
+  color: white;
+  border: none;
+  box-shadow: 0 8px 24px rgba(66,152,181,0.30);
+}
+
+.metric-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.metric-card__icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-gradient-soft);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metric-card--gradient .metric-card__icon-wrap {
+  background: rgba(255,255,255,0.20);
+  color: white;
+}
+
+.metric-card__change {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+
+.metric-card__change--up {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.metric-card__change--down {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.metric-card--gradient .metric-card__change {
+  background: rgba(255,255,255,0.20);
+  color: white;
+}
+
+.metric-card__value {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1;
+  animation: countUp 0.5s ease;
+}
+
+.metric-card--gradient .metric-card__value {
+  color: white;
+}
+
+.metric-card__label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.metric-card--gradient .metric-card__label {
+  color: rgba(255,255,255,0.75);
+}
+
+.metric-card__change-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.metric-card--gradient .metric-card__change-label {
+  color: rgba(255,255,255,0.60);
+}

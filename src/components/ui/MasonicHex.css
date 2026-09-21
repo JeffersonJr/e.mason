@@ -1,0 +1,46 @@
+.masonic-hex {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+
+.masonic-hex--gradient {
+  background: var(--color-gradient);
+  color: white;
+}
+
+.masonic-hex--primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.masonic-hex--accent {
+  background: var(--color-accent);
+  color: white;
+}
+
+.masonic-hex--outline {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.masonic-hex__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.masonic-hex--animated {
+  animation: pulse-glow 2.5s ease-in-out infinite;
+}
+
+.masonic-hex--gradient:hover {
+  filter: brightness(1.08);
+  transform: scale(1.04);
+}

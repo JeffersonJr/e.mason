@@ -1,0 +1,111 @@
+.loja-welcome {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #336e8a 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  position: relative;
+  overflow: hidden;
+}
+
+.loja-welcome::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -30px;
+  width: 180px;
+  height: 180px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+}
+
+.loja-welcome__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-semibold);
+  color: rgba(255,255,255,0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.loja-welcome__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: white;
+}
+
+.loja-welcome__sub {
+  font-size: var(--font-size-sm);
+  color: rgba(255,255,255,0.65);
+  margin-top: 5px;
+}
+
+.loja-welcome__sub strong { color: rgba(255,255,255,0.90); }
+
+.loja-welcome__actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.loja-welcome__actions .btn--accent {
+  background: white;
+  color: var(--color-primary);
+  box-shadow: none;
+}
+
+.loja-welcome__actions .btn--accent:hover {
+  background: rgba(255,255,255,0.90);
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+
+.loja-welcome__actions .btn--outline {
+  border-color: rgba(255,255,255,0.35);
+  color: white;
+}
+
+.loja-welcome__actions .btn--outline:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+/* === MEMBERS TABLE === */
+.loja-members-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.loja-member-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border-light);
+  transition: var(--transition);
+}
+
+.loja-member-row:last-child { border-bottom: none; }
+
+.loja-member-row:hover { background: var(--color-surface-2); margin: 0 calc(-1 * var(--space-4)); padding: 10px var(--space-4); border-radius: var(--radius-sm); border-bottom: 1px solid transparent; }
+
+.loja-member-info { flex: 1; overflow: hidden; }
+
+.loja-member-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.loja-member-role {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
