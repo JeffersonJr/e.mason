@@ -35,7 +35,17 @@ const categoryColors: Record<string, string> = {
 export default function Documents() {
   const { mode } = useProfile();
   const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+  
+  // Main view: 'docs' or 'rituais'
+  const [mainView, setMainView] = useState<'docs' | 'rituais'>('docs');
+  
+  // Doc filters
+  const [activeDocCategory, setActiveDocCategory] = useState<string>('all');
+  
+  // Ritual filters
+  const [activeRitualDegree, setActiveRitualDegree] = useState<string>('all');
+  const [activeRite, setActiveRite] = useState<string>('all');
+
   const [previewDoc, setPreviewDoc] = useState<Document | null>(null);
 
   // Simulate user degree based on mode
@@ -44,11 +54,25 @@ export default function Documents() {
   const filtered = mockDocuments.filter(d => {
     const matchSearch = d.title.toLowerCase().includes(search.toLowerCase()) ||
       d.tags.some(t => t.toLowerCase().includes(search.toLowerCase()));
-    const matchCategory = activeCategory === 'all' || d.category === activeCategory;
-    return matchSearch && matchCategory;
+      
+    if (!matchSearch) return false;
+
+    if (mainView === 'docs') {
+      if (d.category === 'ritual') return false;
+      if (activeDocCategory !== 'all' && d.category !== activeDocCategory) return false;
+      return true;
+    } else {
+      if (d.category !== 'ritual') return false;
+      if (activeRitualDegree !== 'all' && d.degreeName !== activeRitualDegree) return false;
+      if (activeRitualDegree === 'Graus Filosóficos' && activeRite !== 'all' && d.rite !== activeRite) return false;
+      return true;
+    }
   });
 
-  const categories = ['all', ...Array.from(new Set(mockDocuments.map(d => d.category)))];
+  const docCategories = ['all', ...Array.from(new Set(mockDocuments.filter(d => d.category !== 'ritual').map(d => d.category)))];
+  
+  const ritualDegrees = ['all', 'Aprendiz', 'Companheiro', 'Mestre', 'Mestre Instalado', 'Graus Filosóficos'];
+  const philosophicalRites = ['all', 'REAA', 'Emulação', 'Arco Real', 'RER'];
 
   return (
     <div className="documents-page page-enter">
@@ -74,23 +98,76 @@ export default function Documents() {
         </div>
       </div>
 
-      {/* Categories */}
-      <div className="docs-categories">
-        {categories.map(cat => (
-          <button
-            key={cat}
-            className={`docs-category-chip ${activeCategory === cat ? 'docs-category-chip--active' : ''}`}
-            onClick={() => setActiveCategory(cat)}
-            id={`doc-category-${cat}`}
-            style={activeCategory === cat && cat !== 'all' ? { borderColor: categoryColors[cat], color: categoryColors[cat], background: `${categoryColors[cat]}12` } : {}}
-          >
-            {cat !== 'all' && <span style={{ color: categoryColors[cat] }}>{categoryIcons[cat]}</span>}
-            {cat === 'all' ? 'Todos' : categoryLabels[cat]}
-            <span className="docs-category-count">
-              {cat === 'all' ? mockDocuments.length : mockDocuments.filter(d => d.category === cat).length}
-            </span>
-          </button>
-        ))}
+      {/* Main Tabs */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+        <Button 
+          variant={mainView === 'docs' ? 'primary' : 'outline'} 
+          onClick={() => { setMainView('docs'); setPreviewDoc(null); }}
+        >
+          Documentos Oficiais
+        </Button>
+        <Button 
+          variant={mainView === 'rituais' ? 'primary' : 'outline'} 
+          onClick={() => { setMainView('rituais'); setPreviewDoc(null); }}
+        >
+          Rituais e Liturgia
+        </Button>
+      </div>
+
+      {/* Categories / Filters */}
+      <div className="docs-categories" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
+        {mainView === 'docs' ? (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {docCategories.map(cat => (
+              <button
+                key={cat}
+                className={`docs-category-chip ${activeDocCategory === cat ? 'docs-category-chip--active' : ''}`}
+                onClick={() => setActiveDocCategory(cat)}
+                id={`doc-category-${cat}`}
+                style={activeDocCategory === cat && cat !== 'all' ? { borderColor: categoryColors[cat], color: categoryColors[cat], background: `${categoryColors[cat]}12` } : {}}
+              >
+                {cat !== 'all' && <span style={{ color: categoryColors[cat] }}>{categoryIcons[cat]}</span>}
+                {cat === 'all' ? 'Todos' : categoryLabels[cat]}
+                <span className="docs-category-count">
+                  {cat === 'all' ? mockDocuments.filter(d => d.category !== 'ritual').length : mockDocuments.filter(d => d.category === cat).length}
+                </span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
+            {/* Degree filter */}
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {ritualDegrees.map(deg => (
+                <button
+                  key={deg}
+                  className={`docs-category-chip ${activeRitualDegree === deg ? 'docs-category-chip--active' : ''}`}
+                  onClick={() => setActiveRitualDegree(deg)}
+                  style={activeRitualDegree === deg ? { borderColor: categoryColors['ritual'], color: categoryColors['ritual'], background: `${categoryColors['ritual']}12` } : {}}
+                >
+                  {deg === 'all' ? 'Todos os Graus' : deg}
+                </button>
+              ))}
+            </div>
+
+            {/* Rite filter if Filosóficos */}
+            {activeRitualDegree === 'Graus Filosóficos' && (
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '8px 12px', background: 'var(--color-surface-2)', borderRadius: 8 }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center' }}>Rito:</span>
+                {philosophicalRites.map(rite => (
+                  <button
+                    key={rite}
+                    className={`docs-category-chip ${activeRite === rite ? 'docs-category-chip--active' : ''}`}
+                    onClick={() => setActiveRite(rite)}
+                    style={activeRite === rite ? { borderColor: 'var(--color-primary)', color: 'var(--color-primary)' } : { padding: '4px 12px', fontSize: '0.8rem' }}
+                  >
+                    {rite === 'all' ? 'Todos' : rite}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className={`docs-content ${previewDoc ? 'docs-content--split' : ''}`}>

@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Search, Plus, Download, Eye, MoreHorizontal } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Plus, Download, Eye, MoreHorizontal, CreditCard } from 'lucide-react';
 import Card from '../components/ui/Card';
 import { StatusBadge, DegreeBadge } from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Avatar from '../components/ui/Avatar';
+import MemberProfileModal from '../components/modals/MemberProfileModal';
 import { mockMembers } from '../data/mockData';
 import type { Member } from '../types';
 import './Members.css';
@@ -11,9 +13,11 @@ import './Members.css';
 const officeGroups = ['Todos', 'Luzes', 'Cargos Administrativos', 'Irmãos'];
 
 export default function Members() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [officeGroup, setOfficeGroup] = useState('Todos');
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [profileModalMember, setProfileModalMember] = useState<Member | null>(null);
 
   const luzes = ['Venerável Mestre', '1º Vigilante', '2º Vigilante'];
   const cargosAdm = ['Secretário', 'Tesoureiro', 'Orador'];
@@ -28,6 +32,10 @@ export default function Members() {
       : !luzes.includes(m.office || '') && !cargosAdm.includes(m.office || '');
     return matchSearch && matchGroup;
   });
+
+  const handleOpenCarteirinha = (member: Member) => {
+    navigate('/carteirinhas', { state: { memberId: member.id } });
+  };
 
   return (
     <div className="members-page page-enter">
@@ -133,9 +141,23 @@ export default function Members() {
                   <td><StatusBadge status={m.status} /></td>
                   <td className="member-date">{new Date(m.joinedAt).getFullYear()}</td>
                   <td>
-                    <div className="member-actions">
-                      <button className="member-action-btn" title="Ver perfil" id={`view-member-${m.id}`}><Eye size={14} /></button>
-                      <button className="member-action-btn" title="Mais opções"><MoreHorizontal size={14} /></button>
+                    <div className="member-actions" onClick={e => e.stopPropagation()}>
+                      <button
+                        className="member-action-btn"
+                        title="Ver Perfil Completo"
+                        id={`view-member-${m.id}`}
+                        onClick={() => setProfileModalMember(m)}
+                      >
+                        <Eye size={14} />
+                      </button>
+                      <button
+                        className="member-action-btn"
+                        title="Emitir Carteirinha"
+                        id={`carteirinha-member-${m.id}`}
+                        onClick={() => handleOpenCarteirinha(m)}
+                      >
+                        <CreditCard size={14} />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -200,12 +222,36 @@ export default function Members() {
             )}
 
             <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <Button variant="primary" fullWidth icon={<Eye size={15} />}>Ver Perfil Completo</Button>
-              <Button variant="outline" fullWidth>Emitir Carteirinha</Button>
+              <Button
+                variant="primary"
+                fullWidth
+                icon={<Eye size={15} />}
+                onClick={() => setProfileModalMember(selectedMember)}
+              >
+                Ver Perfil Completo
+              </Button>
+              <Button
+                variant="outline"
+                fullWidth
+                icon={<CreditCard size={15} />}
+                onClick={() => handleOpenCarteirinha(selectedMember)}
+              >
+                Emitir Carteirinha
+              </Button>
             </div>
           </div>
         )}
       </div>
+
+      {/* Member Profile Drawer Modal */}
+      {profileModalMember && (
+        <MemberProfileModal
+          member={profileModalMember}
+          onClose={() => setProfileModalMember(null)}
+          onOpenCarteirinha={handleOpenCarteirinha}
+        />
+      )}
     </div>
   );
 }
+

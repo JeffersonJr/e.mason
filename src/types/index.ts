@@ -59,6 +59,8 @@ export interface Document {
   title: string;
   category: 'regulamento' | 'ritual' | 'comunicado' | 'ata' | 'estatuto';
   minDegree: number;
+  degreeName?: string;
+  rite?: string;
   fileSize: string;
   uploadedAt: string;
   uploadedBy: string;

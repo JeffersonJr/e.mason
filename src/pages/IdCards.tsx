@@ -1,19 +1,41 @@
 import { useState } from 'react';
-import { Download, Printer, Share2, QrCode, ChevronLeft, ChevronRight, CreditCard, Smartphone } from 'lucide-react';
+import { Download, Printer, QrCode, ChevronLeft, ChevronRight, CreditCard, Smartphone, RotateCw, ShieldCheck, Search } from 'lucide-react';
 import Card from '../components/ui/Card';
-import Badge, { StatusBadge, DegreeBadge } from '../components/ui/Badge';
+import { StatusBadge, DegreeBadge } from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Avatar from '../components/ui/Avatar';
-import MasonicHex from '../components/ui/MasonicHex';
+
+import CredentialValidatorModal from '../components/modals/CredentialValidatorModal';
 import { mockMembers, currentUser } from '../data/mockData';
+import type { Member } from '../types';
 import './IdCards.css';
 
 type CardMode = 'vertical' | 'horizontal';
 
-export default function IdCards() {
+interface IdCardsProps {
+  initialMember?: Member | null;
+}
+
+export default function IdCards({ initialMember }: IdCardsProps) {
   const [cardMode, setCardMode] = useState<CardMode>('vertical');
-  const [selectedIdx, setSelectedIdx] = useState(0);
-  const member = mockMembers[selectedIdx] || {
+  const [selectedIdx, setSelectedIdx] = useState<number>(() => {
+    if (initialMember) {
+      const idx = mockMembers.findIndex(m => m.id === initialMember.id);
+      return idx >= 0 ? idx : 0;
+    }
+    return 0;
+  });
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [showValidator, setShowValidator] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredMembers = mockMembers.filter(m =>
+    m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    m.cim.includes(searchTerm) ||
+    (m.office || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const currentMember = filteredMembers[selectedIdx] || mockMembers[0] || {
     ...currentUser,
     avatar: currentUser.avatar,
     office: currentUser.role,
@@ -26,7 +48,14 @@ export default function IdCards() {
   };
 
   const degreeLabels: Record<number, string> = {
-    1: 'Aprendiz', 2: 'Companheiro', 3: 'Mestre', 33: 'REAA – 33°',
+    1: 'Aprendiz Maçom',
+    2: 'Companheiro Maçom',
+    3: 'Mestre Maçom',
+    33: 'REAA – 33° Grau',
+  };
+
+  const handlePrint = () => {
+    window.print();
   };
 
   return (
@@ -48,13 +77,19 @@ export default function IdCards() {
             id="card-mode-horizontal"
           >
             <CreditCard size={16} />
-            Impressão (Horizontal)
+            Impressão PVC (Horizontal)
           </button>
         </div>
-        <div style={{ display: 'flex', gap: 8, marginLeft: 'auto' }}>
-          <Button variant="outline" size="sm" icon={<Share2 size={14} />}>Compartilhar</Button>
-          <Button variant="outline" size="sm" icon={<Printer size={14} />}>Imprimir</Button>
-          <Button variant="accent" size="sm" icon={<Download size={14} />}>Baixar PDF</Button>
+        <div style={{ display: 'flex', gap: 8, marginLeft: 'auto', flexWrap: 'wrap' }}>
+          <Button variant="outline" size="sm" icon={<ShieldCheck size={14} />} onClick={() => setShowValidator(true)}>
+            Validar Autenticidade
+          </Button>
+          <Button variant="outline" size="sm" icon={<Printer size={14} />} onClick={handlePrint}>
+            Imprimir
+          </Button>
+          <Button variant="accent" size="sm" icon={<Download size={14} />} onClick={handlePrint}>
+            Baixar PDF
+          </Button>
         </div>
       </div>
 
@@ -63,14 +98,32 @@ export default function IdCards() {
         <Card padding="none" className="idcards-selector">
           <div className="idcards-selector-header">
             <div className="idcards-selector-title">Selecionar Irmão</div>
-            <div className="idcards-selector-count">{mockMembers.length} membros</div>
+            <div className="idcards-selector-count">{filteredMembers.length} membros</div>
           </div>
+          
+          <div className="idcards-search-box">
+            <Search size={14} style={{ color: 'var(--color-text-secondary)', marginRight: 6 }} />
+            <input
+              type="text"
+              placeholder="Buscar por nome, CIM ou cargo..."
+              value={searchTerm}
+              onChange={e => {
+                setSearchTerm(e.target.value);
+                setSelectedIdx(0);
+              }}
+              className="idcards-search-input"
+            />
+          </div>
+
           <div className="idcards-selector-list">
-            {mockMembers.map((m, idx) => (
+            {filteredMembers.map((m, idx) => (
               <button
                 key={m.id}
                 className={`idcards-selector-item ${idx === selectedIdx ? 'idcards-selector-item--active' : ''}`}
-                onClick={() => setSelectedIdx(idx)}
+                onClick={() => {
+                  setSelectedIdx(idx);
+                  setIsFlipped(false);
+                }}
                 id={`select-member-${m.id}`}
               >
                 <Avatar initials={m.avatar} size="sm" status={m.status} />
@@ -81,15 +134,30 @@ export default function IdCards() {
                 <DegreeBadge degree={m.degree} />
               </button>
             ))}
+            {filteredMembers.length === 0 && (
+              <div style={{ padding: 24, textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>
+                Nenhum membro encontrado.
+              </div>
+            )}
           </div>
         </Card>
 
         {/* Card preview */}
         <div className="idcards-preview-area">
           {cardMode === 'vertical' ? (
-            <VerticalCard member={member} degreeLabels={degreeLabels} />
+            <VerticalCard
+              member={currentMember}
+              degreeLabels={degreeLabels}
+              isFlipped={isFlipped}
+              onFlip={() => setIsFlipped(!isFlipped)}
+              onValidate={() => setShowValidator(true)}
+            />
           ) : (
-            <HorizontalCard member={member} degreeLabels={degreeLabels} />
+            <HorizontalCard
+              member={currentMember}
+              degreeLabels={degreeLabels}
+              onValidate={() => setShowValidator(true)}
+            />
           )}
 
           {/* Navigation */}
@@ -98,18 +166,24 @@ export default function IdCards() {
               variant="outline"
               size="sm"
               icon={<ChevronLeft size={14} />}
-              onClick={() => setSelectedIdx(Math.max(0, selectedIdx - 1))}
+              onClick={() => {
+                setSelectedIdx(Math.max(0, selectedIdx - 1));
+                setIsFlipped(false);
+              }}
               disabled={selectedIdx === 0}
             >
               Anterior
             </Button>
-            <span className="idcards-nav-count">{selectedIdx + 1} / {mockMembers.length}</span>
+            <span className="idcards-nav-count">{selectedIdx + 1} / {filteredMembers.length}</span>
             <Button
               variant="outline"
               size="sm"
               iconRight={<ChevronRight size={14} />}
-              onClick={() => setSelectedIdx(Math.min(mockMembers.length - 1, selectedIdx + 1))}
-              disabled={selectedIdx === mockMembers.length - 1}
+              onClick={() => {
+                setSelectedIdx(Math.min(filteredMembers.length - 1, selectedIdx + 1));
+                setIsFlipped(false);
+              }}
+              disabled={selectedIdx === filteredMembers.length - 1}
             >
               Próximo
             </Button>
@@ -118,27 +192,27 @@ export default function IdCards() {
 
         {/* Info panel */}
         <Card padding="md" className="idcards-info-panel">
-          <div className="idcards-info-title">Informações da Carteirinha</div>
+          <div className="idcards-info-title">Dados da Carteirinha Maçônica</div>
           <div className="idcards-info-grid">
             <div className="idcards-info-item">
               <div className="idcards-info-label">Portador</div>
-              <div className="idcards-info-value">{member.name}</div>
+              <div className="idcards-info-value">{currentMember.name}</div>
             </div>
             <div className="idcards-info-item">
               <div className="idcards-info-label">CIM</div>
-              <div className="idcards-info-value"><code>{member.cim}</code></div>
+              <div className="idcards-info-value"><code>{currentMember.cim}</code></div>
             </div>
             <div className="idcards-info-item">
               <div className="idcards-info-label">Cargo</div>
-              <div className="idcards-info-value">{member.office}</div>
+              <div className="idcards-info-value">{currentMember.office}</div>
             </div>
             <div className="idcards-info-item">
               <div className="idcards-info-label">Grau</div>
-              <div className="idcards-info-value">{degreeLabels[member.degree] || `${member.degree}º Grau`}</div>
+              <div className="idcards-info-value">{degreeLabels[currentMember.degree] || `${currentMember.degree}º Grau`}</div>
             </div>
             <div className="idcards-info-item">
-              <div className="idcards-info-label">Status</div>
-              <StatusBadge status={member.status} />
+              <div className="idcards-info-label">Status Quitação</div>
+              <StatusBadge status={currentMember.status} />
             </div>
             <div className="idcards-info-item">
               <div className="idcards-info-label">Validade</div>
@@ -147,144 +221,227 @@ export default function IdCards() {
           </div>
 
           <div className="idcards-qr-info">
-            <div className="idcards-qr-title">QR Code de Validação</div>
-            <div className="idcards-qr-sub">O QR Code dinâmico permite verificação instantânea da regularidade maçônica do portador. Válido por 24h após cada geração.</div>
-          </div>
-
-          <Button variant="primary" fullWidth icon={<QrCode size={15} />}>Gerar Novo QR Code</Button>
-        </Card>
-      </div>
-    </div>
-  );
-}
-
-// === VERTICAL CARD ===
-function VerticalCard({ member, degreeLabels }: { member: any; degreeLabels: Record<number, string> }) {
-  return (
-    <div className="id-card-vertical animate-fadein">
-      {/* Header gradient */}
-      <div className="id-card-v__header">
-        <div className="id-card-v__header-content">
-          <MasonicHex size={36} variant="gradient">
-            <svg viewBox="0 0 24 24" fill="white" width="55%" height="55%">
-              <path d="M12 2L22 7.5V16.5L12 22L2 16.5V7.5L12 2ZM12 4.311L4 8.5V15.5L12 19.689L20 15.5V8.5L12 4.311Z" />
-            </svg>
-          </MasonicHex>
-          <div>
-            <div className="id-card-v__org">e.mason</div>
-            <div className="id-card-v__potencia">Grande Oriente do MA e Balsas</div>
-          </div>
-        </div>
-        <div className="id-card-v__watermark">GOMB</div>
-      </div>
-
-      {/* Photo area */}
-      <div className="id-card-v__photo-area">
-        <div className="id-card-v__avatar">
-          <Avatar initials={member.avatar} size="xl" gradient />
-          <div className="id-card-v__status-ring" style={{ borderColor: member.status === 'adimplente' ? 'var(--color-accent)' : member.status === 'inadimplente' ? 'var(--color-danger)' : 'var(--color-warning)' }} />
-        </div>
-      </div>
-
-      {/* Info */}
-      <div className="id-card-v__info">
-        <div className="id-card-v__name">{member.name}</div>
-        <div className="id-card-v__cim">{member.cim}</div>
-
-        <div className="id-card-v__tags">
-          <div className="id-card-v__tag id-card-v__tag--primary">
-            {member.office}
-          </div>
-          <div className="id-card-v__tag id-card-v__tag--degree">
-            {degreeLabels[member.degree] || `${member.degree}º Grau`}
-          </div>
-        </div>
-
-        <div className="id-card-v__lodge">{member.lodge || 'Loja Luz e Progresso'}</div>
-      </div>
-
-      {/* QR Code area */}
-      <div className="id-card-v__qr-section">
-        <div className="id-card-v__qr-code">
-          <QRCodeSVG />
-        </div>
-        <div className="id-card-v__qr-text">
-          <div className="id-card-v__qr-label">Validação Digital</div>
-          <div className="id-card-v__qr-sub">Escaneie para verificar regularidade</div>
-          <Badge variant={member.status === 'adimplente' ? 'accent' : 'danger'} dot>
-            {member.status === 'adimplente' ? 'Regular e Adimplente' : member.status === 'inadimplente' ? 'Inadimplente' : 'Licenciado'}
-          </Badge>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="id-card-v__footer">
-        <span>Válido até 31/12/2026</span>
-        <span>powered by e.mason</span>
-      </div>
-    </div>
-  );
-}
-
-// === HORIZONTAL CARD ===
-function HorizontalCard({ member, degreeLabels }: { member: any; degreeLabels: Record<number, string> }) {
-  return (
-    <div className="id-card-horizontal animate-fadein">
-      {/* Front side */}
-      <div className="id-card-h">
-        <div className="id-card-h__left">
-          <div className="id-card-h__header">
-            <MasonicHex size={28} variant="gradient" />
-            <div>
-              <div className="id-card-h__org">e.mason</div>
-              <div className="id-card-h__sub">GOMB</div>
+            <div className="idcards-qr-title">Verificação de Autenticidade</div>
+            <div className="idcards-qr-sub">
+              A carteirinha digital possui validação via QR Code dinâmico conectado diretamente aos servidores do Grande Oriente.
             </div>
           </div>
-          <div className="id-card-h__avatar">
-            <Avatar initials={member.avatar} size="lg" gradient />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16 }}>
+            {cardMode === 'vertical' && (
+              <Button variant="outline" fullWidth icon={<RotateCw size={15} />} onClick={() => setIsFlipped(!isFlipped)}>
+                {isFlipped ? 'Ver Frente da Carteirinha' : 'Girar Carteirinha (Ver Verso)'}
+              </Button>
+            )}
+            <Button variant="primary" fullWidth icon={<QrCode size={15} />} onClick={() => setShowValidator(true)}>
+              Simular Leitura do QR Code
+            </Button>
           </div>
-          <div className="id-card-h__degree-badge">
-            {degreeLabels[member.degree] || `${member.degree}º Grau`}
+        </Card>
+      </div>
+
+      {/* Credential Validator Modal */}
+      {showValidator && (
+        <CredentialValidatorModal
+          member={currentMember}
+          onClose={() => setShowValidator(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function VerticalCard({
+  member,
+  degreeLabels,
+  isFlipped,
+  onFlip,
+  onValidate,
+}: {
+  member: Member;
+  degreeLabels: Record<number, string>;
+  isFlipped: boolean;
+  onFlip: () => void;
+  onValidate: () => void;
+}) {
+  return (
+    <div className={`card-flip-container ${isFlipped ? 'flipped' : ''}`} onClick={onFlip}>
+      <div className="card-flip-inner">
+        
+        {/* FRONT SIDE */}
+        <div className="card-flip-front">
+          <svg className="card-watermark-seal" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="3" />
+            <polygon points="50,15 80,75 20,75" fill="none" stroke="currentColor" strokeWidth="2.5" />
+            <polygon points="50,85 20,25 80,25" fill="none" stroke="currentColor" strokeWidth="2.5" />
+          </svg>
+          
+          <div className="card-ref-header">
+            <div className="card-ref-header-left">
+              <div className="card-ref-logo">
+                <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', borderRadius: '50%', background: '#FAF7F2' }}>
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="#B45309" strokeWidth="4" />
+                  <polygon points="50,20 75,70 25,70" fill="none" stroke="#B45309" strokeWidth="3" />
+                </svg>
+              </div>
+              <div>
+                <div className="card-ref-title">GOMB</div>
+                <div className="card-ref-subtitle">MARANHÃO E BALSAS</div>
+              </div>
+            </div>
+            <div className="card-ref-badge">REGULAR</div>
+          </div>
+
+          <div className="card-ref-photo-box">
+            <div style={{ width: 105, height: 125, margin: '0 auto' }}>
+              <Avatar initials={member.avatar} size="xl" gradient />
+            </div>
+          </div>
+
+          <div className="card-ref-name">{member.name}</div>
+          <div className="card-ref-degree">{degreeLabels[member.degree] || `${member.degree}º Grau`} - {member.office}</div>
+
+          <div className="card-ref-grid">
+            <div className="card-ref-field">
+              <span className="card-ref-label">CIM</span>
+              <span className="card-ref-val">{member.cim}</span>
+            </div>
+            <div className="card-ref-field">
+              <span className="card-ref-label">Iniciação</span>
+              <span className="card-ref-val">{new Date(member.joinedAt).toLocaleDateString('pt-BR')}</span>
+            </div>
+            <div className="card-ref-field card-ref-full-col">
+              <span className="card-ref-label">Loja</span>
+              <span className="card-ref-val">{member.lodge || 'A.R.L.S. União Fraternal Nº 001'}</span>
+            </div>
+          </div>
+
+          <div className="card-ref-footer">
+            <span className="card-ref-motto">LIBERTAS QUAE SERA TAMEN</span>
+            <span className="card-ref-affil">COMAB</span>
           </div>
         </div>
 
-        <div className="id-card-h__main">
-          <div className="id-card-h__name">{member.name}</div>
-          <div className="id-card-h__role">{member.office}</div>
-          <div className="id-card-h__lodge">{member.lodge || 'Loja Luz e Progresso'}</div>
-          <div className="id-card-h__cim-row">
-            <span className="id-card-h__cim-label">CIM:</span>
-            <span className="id-card-h__cim">{member.cim}</span>
+        {/* BACK SIDE */}
+        <div className="card-flip-back">
+          <div className="card-back-header">
+            CERTIFICADO DE REGULARIDADE MAÇÔNICA
           </div>
-          <div className="id-card-h__validity">Válido até: 31/12/2026</div>
-          <div className={`id-card-h__status id-card-h__status--${member.status}`}>
-            {member.status === 'adimplente' ? '● Regular' : member.status === 'inadimplente' ? '● Inadimplente' : '● Licenciado'}
+
+          <div style={{ fontSize: '0.62rem', color: '#1E293B', marginTop: 12, lineHeight: 1.4 }}>
+            Certificamos que o Irmão <strong>{member.name}</strong> é membro ativo e regular do quadro de obreiros desta augusta oficina, no gozo pleno de seus direitos maçônicos.
+          </div>
+
+          <div className="card-back-qr-box" onClick={(e) => { e.stopPropagation(); onValidate(); }}>
+            <QRCodeSVG size={90} />
+          </div>
+          <div className="card-back-qr-sub">Escaneie o código acima para validar a autenticidade desta credencial digital.</div>
+
+          <div className="card-back-signatures">
+            <div>
+              <div className="card-back-sig-line" />
+              <div className="card-back-sig-title">Ir. Venerável Mestre</div>
+              <div className="card-back-sig-sub">Venerável Mestre</div>
+            </div>
+            <div>
+              <div className="card-back-sig-line" />
+              <div className="card-back-sig-title">Ir. Secretário</div>
+              <div className="card-back-sig-sub">Guardador dos Selos</div>
+            </div>
+          </div>
+          
+          <div className="card-ref-footer" style={{ marginTop: 12 }}>
+            <span className="card-ref-affil">Validade: 31/12/2026</span>
           </div>
         </div>
 
-        <div className="id-card-h__right">
-          <QRCodeSVG size={80} />
-          <div className="id-card-h__qr-label">Verificar</div>
-          <div className="id-card-h__watermark-hex">
-            <MasonicHex size={120} variant="outline" />
+      </div>
+    </div>
+  );
+}
+
+function HorizontalCard({
+  member,
+  degreeLabels,
+  onValidate,
+}: {
+  member: Member;
+  degreeLabels: Record<number, string>;
+  onValidate: () => void;
+}) {
+  return (
+    <div className="horizontal-cards-pair">
+      {/* Front PVC */}
+      <div className="h-card-frame">
+        <svg className="card-watermark-seal" viewBox="0 0 100 100" style={{ left: '70%', top: '50%' }}>
+          <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="3" />
+          <polygon points="50,15 80,75 20,75" fill="none" stroke="currentColor" strokeWidth="2.5" />
+          <polygon points="50,85 20,25 80,25" fill="none" stroke="currentColor" strokeWidth="2.5" />
+        </svg>
+
+        <div className="h-card-left-col">
+          <Avatar initials={member.avatar} size="xl" gradient />
+          <div className="card-ref-badge" style={{ marginTop: 12 }}>REGULAR</div>
+        </div>
+        
+        <div className="h-card-right-col">
+          <div className="card-ref-header" style={{ paddingBottom: 6, marginBottom: 8 }}>
+            <div className="card-ref-header-left">
+              <div className="card-ref-logo">
+                <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', borderRadius: '50%', background: '#FAF7F2' }}>
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="#B45309" strokeWidth="4" />
+                </svg>
+              </div>
+              <div>
+                <div className="card-ref-title">GOMB</div>
+                <div className="card-ref-subtitle">GRANDE ORIENTE DO MARANHÃO E BALSAS</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="card-ref-name" style={{ fontSize: '1.25rem' }}>{member.name}</div>
+          <div className="card-ref-degree">{degreeLabels[member.degree] || `${member.degree}º Grau`} - {member.office}</div>
+
+          <div className="card-ref-grid" style={{ marginTop: 'auto', padding: '8px 12px' }}>
+            <div className="card-ref-field">
+              <span className="card-ref-label">CIM</span>
+              <span className="card-ref-val">{member.cim}</span>
+            </div>
+            <div className="card-ref-field">
+              <span className="card-ref-label">Iniciação</span>
+              <span className="card-ref-val">{new Date(member.joinedAt).toLocaleDateString('pt-BR')}</span>
+            </div>
+            <div className="card-ref-field card-ref-full-col">
+              <span className="card-ref-label">Loja</span>
+              <span className="card-ref-val">{member.lodge || 'A.R.L.S. União Fraternal Nº 001'}</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="id-card-h id-card-h--back">
-        <div className="id-card-h__back-pattern" />
-        <div className="id-card-h__back-content">
-          <div className="id-card-h__back-org">
-            <MasonicHex size={24} variant="gradient" />
-            <span>Grande Oriente do Maranhão e Balsas</span>
+      {/* Back PVC */}
+      <div className="h-card-frame" style={{ flexDirection: 'row-reverse' }}>
+        <div className="h-card-left-col" onClick={onValidate} style={{ cursor: 'pointer', background: 'white', padding: 8, borderRadius: 12, height: 'fit-content', border: '1px solid #E2D9C8', alignSelf: 'center' }}>
+          <QRCodeSVG size={90} />
+          <div style={{ fontSize: '0.45rem', textAlign: 'center', marginTop: 4, color: '#64748B' }}>SCAN PARA VALIDAR</div>
+        </div>
+        
+        <div className="h-card-right-col">
+          <div className="card-back-header">CERTIFICADO DE IDENTIDADE MAÇÔNICA</div>
+          <div style={{ fontSize: '0.62rem', color: '#1E293B', marginTop: 12, lineHeight: 1.4 }}>
+            O titular desta credencial está em pleno gozo de seus direitos maçônicos perante o Grande Oriente e a {member.lodge || 'sua Loja'}.
           </div>
-          <div className="id-card-h__back-text">
-            Esta carteirinha é de uso pessoal e intransferível. Em caso de perda ou roubo, comunique imediatamente à Secretaria da Potência.
+          
+          <div className="card-back-signatures" style={{ marginTop: 'auto' }}>
+            <div>
+              <div className="card-back-sig-line" />
+              <div className="card-back-sig-title">Ir. Venerável Mestre</div>
+            </div>
+            <div>
+              <div className="card-back-sig-line" />
+              <div className="card-back-sig-title">Ir. Secretário</div>
+            </div>
           </div>
-          <div className="id-card-h__back-contact">
-            secretaria@gomb.org.br · (98) 3232-0000
-          </div>
-          <div className="id-card-h__magnetic-stripe" />
         </div>
       </div>
     </div>
@@ -298,13 +455,12 @@ function QRCodeSVG({ size = 100 }: { size?: number }) {
   const pattern = Array.from({ length: cells * cells }, (_, i) => {
     const row = Math.floor(i / cells);
     const col = i % cells;
-    // Corner squares
     const isCorner = (row < 3 && col < 3) || (row < 3 && col >= cells - 3) || (row >= cells - 3 && col < 3);
-    return isCorner || Math.random() > 0.5;
+    return isCorner || Math.random() > 0.45;
   });
 
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: 'block' }}>
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: 'block', borderRadius: 6, background: '#fff', padding: 4 }}>
       <rect width={size} height={size} fill="white" />
       {pattern.map((filled, i) => {
         const row = Math.floor(i / cells);
@@ -312,10 +468,10 @@ function QRCodeSVG({ size = 100 }: { size?: number }) {
         return filled ? (
           <rect
             key={i}
-            x={col * cellSize + 1}
-            y={row * cellSize + 1}
-            width={cellSize - 2}
-            height={cellSize - 2}
+            x={col * cellSize + 0.5}
+            y={row * cellSize + 0.5}
+            width={cellSize - 1}
+            height={cellSize - 1}
             fill="#0F172A"
             rx={1}
           />
@@ -324,3 +480,4 @@ function QRCodeSVG({ size = 100 }: { size?: number }) {
     </svg>
   );
 }
+
